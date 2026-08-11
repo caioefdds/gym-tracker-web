@@ -1,0 +1,16 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+app:
+  jwt:
+    secret: test-secret-please-only-for-testcontainers-min-32-chars
+    expiration-hours: 1
+  cors:
+    allowed-origins:
+      - http://localhost:5173
