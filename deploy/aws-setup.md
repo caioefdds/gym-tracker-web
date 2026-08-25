@@ -27,8 +27,8 @@ Custo estimado dentro do free tier: **$0** nos primeiros 12 meses. Depois ~$15-2
 ## 1. ECR — repositórios das imagens
 
 ```bash
-aws ecr create-repository --repository-name gym-tracker-backend --region us-east-1
-aws ecr create-repository --repository-name gym-tracker-frontend --region us-east-1
+aws ecr create-repository --repository-name gym-tracker-backend --region $AWS_REGION
+aws ecr create-repository --repository-name gym-tracker-frontend --region $AWS_REGION
 ```
 
 ## 2. OIDC Provider para GitHub Actions
@@ -59,7 +59,7 @@ Depois crie a IAM Role `GymTrackerDeployRole`:
         "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
       },
       "StringLike": {
-        "token.actions.githubusercontent.com:sub": "repo:SEU_USUARIO/gym-tracker-web:*"
+        "token.actions.githubusercontent.com:sub": "repo:caioefdds/gym-tracker-web:*"
       }
     }
   }]
