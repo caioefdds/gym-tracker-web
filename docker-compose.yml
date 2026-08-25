@@ -18,6 +18,9 @@ services:
   backend:
     build:
       context: ./backend
+      args:
+        GIT_SHA: local
+        BUILD_TIME: local
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/gym_tracker?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
@@ -39,6 +42,9 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        GIT_SHA: local
+        BUILD_TIME: local
     ports:
       - "5173:80"
     depends_on:

@@ -39,6 +39,9 @@ info:
     version: 0.1.0
 
 app:
+  version:
+    sha: ${GIT_SHA:unknown}
+    built-at: ${BUILD_TIME:unknown}
   jwt:
     secret: ${JWT_SECRET:dev-secret-change-me-please-min-32-characters-long}
     expiration-hours: 24
