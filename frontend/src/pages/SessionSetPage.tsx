@@ -22,7 +22,7 @@ export function SessionSetPage() {
   const navigate = useNavigate();
   const { data, isPending, isError, error } = useSession(sid);
   const log = useLogSet(sid);
-  const update = useUpdateLog(sid);
+  const update = useUpdateLog();
 
   const exercise = data?.exercises.find((e) => e.exerciseId === eid);
   const set = exercise?.sets[index];

@@ -251,7 +251,7 @@ export function useLogSet(sessionId: number) {
   });
 }
 
-export function useUpdateLog(sessionId: number) {
+export function useUpdateLog() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (input: { id: number; weightKg: number; performedReps: number }) =>

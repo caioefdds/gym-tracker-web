@@ -52,7 +52,10 @@ export function ActiveSessionPage() {
             type="button"
             variant="ghost"
             size="icon"
-            onClick={() => navigate(data ? `/plans/${data.planId}` : -1)}
+            onClick={() => {
+              if (data) navigate(`/plans/${data.planId}`);
+              else navigate(-1);
+            }}
             aria-label="Sair"
           >
             <X className="h-4 w-4" />

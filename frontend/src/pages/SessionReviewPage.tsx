@@ -127,7 +127,7 @@ function SetRow({
   const [reps, setReps] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const log = useLogSet(sessionId);
-  const update = useUpdateLog(sessionId);
+  const update = useUpdateLog();
   const remove = useDeleteLog();
 
   const startEdit = () => {
