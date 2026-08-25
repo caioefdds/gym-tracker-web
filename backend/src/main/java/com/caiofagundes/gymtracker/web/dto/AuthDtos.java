@@ -25,5 +25,14 @@ public class AuthDtos {
 
     public record RegisterRequest(@Email @NotBlank String email, @NotBlank @Size(min=8, max=100) @NotBlank @Size(min=8, max=100) String password, @NotBlank @Size(min=1, max=120) @NotBlank @Size(min=1, max=120) String name) {
     }
+
+    public record ForgotPasswordRequest(@Email @NotBlank String email) {
+    }
+
+    public record ResetPasswordRequest(@NotBlank String token, @NotBlank @Size(min = 8, max = 100) String password) {
+    }
+
+    public record MessageResponse(String message) {
+    }
 }
 

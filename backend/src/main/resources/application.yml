@@ -16,6 +16,14 @@ spring:
   flyway:
     enabled: true
     baseline-on-migrate: true
+  mail:
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
 
 server:
   port: 8080
@@ -42,6 +50,9 @@ app:
   version:
     sha: ${GIT_SHA:unknown}
     built-at: ${BUILD_TIME:unknown}
+  public-url: ${APP_PUBLIC_URL:http://localhost:5173}
+  mail:
+    from: ${APP_MAIL_FROM:Gym Tracker <noreply@localhost>}
   jwt:
     secret: ${JWT_SECRET:dev-secret-change-me-please-min-32-characters-long}
     expiration-hours: 24

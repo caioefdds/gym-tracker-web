@@ -27,7 +27,7 @@ api.interceptors.response.use(
 
 function isAuthCredentialRequest(error: AxiosError): boolean {
   const url = error.config?.url ?? '';
-  return /\/api\/auth\/(login|register)(?:\?|$)/.test(url);
+  return /\/api\/auth\/(login|register|forgot-password|reset-password)(?:\?|$)/.test(url);
 }
 
 export function extractApiError(err: unknown): string {

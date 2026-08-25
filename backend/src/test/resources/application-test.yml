@@ -8,6 +8,9 @@ spring:
     baseline-on-migrate: true
 
 app:
+  public-url: http://localhost:5173
+  mail:
+    from: Gym Tracker <noreply@test.local>
   jwt:
     secret: test-secret-please-only-for-testcontainers-min-32-chars
     expiration-hours: 1

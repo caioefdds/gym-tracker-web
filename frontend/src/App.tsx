@@ -4,11 +4,13 @@ import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom
 import { ActiveSessionPage } from './pages/ActiveSessionPage';
 import { SessionSetPage } from './pages/SessionSetPage';
 import { ExerciseFormPage } from './pages/ExerciseFormPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { LoginPage } from './pages/LoginPage';
 import { PlanDetailPage } from './pages/PlanDetailPage';
 import { PlanFormPage } from './pages/PlanFormPage';
 import { PlansListPage } from './pages/PlansListPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { SessionReviewPage } from './pages/SessionReviewPage';
 import { WorkoutFormPage } from './pages/WorkoutFormPage';
 import { useAuth } from './stores/auth';
@@ -55,7 +57,9 @@ export default function App() {
           <Route element={<PublicRoute />}>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           </Route>
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<PlansListPage />} />
             <Route path="/plans/:id" element={<PlanDetailPage />} />

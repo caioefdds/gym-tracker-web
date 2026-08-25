@@ -9,6 +9,12 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS}
       SPRING_PROFILES_ACTIVE: prod
+      APP_PUBLIC_URL: ${APP_PUBLIC_URL:-http://56.124.89.122}
+      APP_MAIL_FROM: "${APP_MAIL_FROM:-Gym Tracker <noreply@localhost>}"
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
     expose:
       - "8080"
     healthcheck:

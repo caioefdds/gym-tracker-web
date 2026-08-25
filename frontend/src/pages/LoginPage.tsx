@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,6 +19,8 @@ type FormData = z.infer<typeof schema>;
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const notice = (location.state as { notice?: string } | null)?.notice;
   const setAuth = useAuth((s) => s.setAuth);
   const login = useLogin();
   const [formError, setFormError] = useState<string | null>(null);
@@ -65,7 +67,15 @@ export function LoginPage() {
             {errors.password && (
               <p className="text-xs text-destructive">{errors.password.message}</p>
             )}
+            <p className="text-right">
+              <Link to="/forgot-password" className="text-xs font-medium text-primary hover:underline">
+                Esqueceu a senha?
+              </Link>
+            </p>
           </div>
+          {notice && (
+            <p className="rounded-xl border border-border bg-muted/40 px-3 py-2 text-sm">{notice}</p>
+          )}
           {formError && (
             <p role="alert" className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {formError}
