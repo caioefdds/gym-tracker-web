@@ -104,18 +104,23 @@ jobs:
           INSTANCE: ${{ secrets.EC2_INSTANCE_ID }}
         run: |
           set -euo pipefail
+          COMPOSE_B64=$(base64 -w0 docker-compose.prod.yml)
           PARAMS=$(jq -n \
             --arg region "$REGION" \
             --arg registry "$REGISTRY" \
             --arg sha "$SHA" \
+            --arg compose "$COMPOSE_B64" \
             '{commands: [
               "set -euo pipefail",
               "cd /opt/gym-tracker",
+              "printf %s \($compose) | base64 -d > docker-compose.prod.yml",
               "aws ecr get-login-password --region \($region) | docker login --username AWS --password-stdin \($registry)",
               "export IMAGE_TAG=\($sha)",
               "export ECR_REGISTRY=\($registry)",
+              "grep -q ^IMAGE_TAG= .env && sed -i \"s/^IMAGE_TAG=.*/IMAGE_TAG=\($sha)/\" .env || echo IMAGE_TAG=\($sha) >> .env",
+              "grep -q ^ECR_REGISTRY= .env && sed -i \"s/^ECR_REGISTRY=.*/ECR_REGISTRY=\($registry)/\" .env || echo ECR_REGISTRY=\($registry) >> .env",
               "docker compose -f docker-compose.prod.yml --env-file .env pull",
-              "docker compose -f docker-compose.prod.yml --env-file .env up -d",
+              "if [ -f docker-compose.mailhealth.yml ]; then docker compose -f docker-compose.prod.yml -f docker-compose.mailhealth.yml --env-file .env up -d; else docker compose -f docker-compose.prod.yml --env-file .env up -d; fi",
               "docker image prune -f"
             ]}')
           COMMAND_ID=$(aws ssm send-command \
