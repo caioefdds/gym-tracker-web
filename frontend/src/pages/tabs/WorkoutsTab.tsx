@@ -31,6 +31,7 @@ export function WorkoutsTab({ planId, plan }: Props) {
           <div className="flex items-center justify-between p-5 pb-3">
             <h3 className="text-base font-semibold">{w.name}</h3>
             <Button
+              type="button"
               variant="ghost"
               size="icon"
               onClick={() => navigate(`/plans/${planId}/workouts/${w.id}/edit`)}
@@ -66,6 +67,7 @@ export function WorkoutsTab({ planId, plan }: Props) {
           )}
           <div className="border-t border-border p-3">
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={() =>
@@ -79,6 +81,7 @@ export function WorkoutsTab({ planId, plan }: Props) {
         </Card>
       ))}
       <Button
+        type="button"
         variant="outline"
         className="w-full"
         size="lg"

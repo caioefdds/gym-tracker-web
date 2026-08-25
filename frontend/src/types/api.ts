@@ -100,6 +100,33 @@ export interface SessionResponse {
   exercises: SessionExerciseNode[];
 }
 
+export interface HistorySet {
+  orderIndex: number;
+  type: SetType;
+  weightKg: number;
+  performedReps: number;
+}
+
+export interface HistorySession {
+  sessionId: number;
+  date: string;
+  sets: HistorySet[];
+}
+
+export interface ExerciseHistoryResponse {
+  exerciseName: string;
+  sessions: HistorySession[];
+}
+
+export interface SessionSummary {
+  sessionId: number;
+  workoutId: number;
+  workoutName: string;
+  startedAt: string;
+  finishedAt: string | null;
+  loggedSets: number;
+}
+
 export interface SetLogResponse {
   id: number;
   plannedSetId: number;

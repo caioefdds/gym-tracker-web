@@ -1,6 +1,6 @@
 import { Pencil } from 'lucide-react';
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { extractApiError } from '@/lib/api/client';
@@ -22,7 +22,13 @@ export function PlanDetailPage() {
   const { id } = useParams<{ id: string }>();
   const planId = Number(id);
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>('workouts');
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab');
+  const [tab, setTab] = useState<Tab>(
+    initialTab === 'start' || initialTab === 'progress' || initialTab === 'workouts'
+      ? initialTab
+      : 'workouts',
+  );
   const { data, isPending, isError, error } = usePlanDetail(planId);
 
   return (
@@ -31,6 +37,7 @@ export function PlanDetailPage() {
       back="/"
       actions={
         <Button
+          type="button"
           variant="ghost"
           size="icon"
           onClick={() => navigate(`/plans/${planId}/edit`)}

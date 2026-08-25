@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from './client';
 import type {
   AuthResponse,
+  ExerciseHistoryResponse,
   ExerciseNode,
   ExerciseProgress,
   ExerciseSummary,
@@ -9,6 +10,7 @@ import type {
   PlanDetail,
   PlannedSetNode,
   SessionResponse,
+  SessionSummary,
   SetLogResponse,
   SetType,
   User,
@@ -216,6 +218,23 @@ export function useSession(sessionId: number | null) {
   });
 }
 
+export function useExerciseHistory(
+  sessionId: number | null,
+  exerciseId: number | null,
+  enabled = true,
+) {
+  return useQuery({
+    queryKey: ['sessions', sessionId, 'history', exerciseId],
+    enabled: enabled && sessionId != null && exerciseId != null,
+    queryFn: async () =>
+      (
+        await api.get<ExerciseHistoryResponse>(
+          `/api/sessions/${sessionId}/exercises/${exerciseId}/history`,
+        )
+      ).data,
+  });
+}
+
 export function useLogSet(sessionId: number) {
   const qc = useQueryClient();
   return useMutation({
@@ -225,7 +244,10 @@ export function useLogSet(sessionId: number) {
       performedReps: number;
     }) =>
       (await api.post<SetLogResponse>(`/api/sessions/${sessionId}/logs`, input)).data,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['sessions', sessionId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['sessions'] });
+      qc.invalidateQueries({ queryKey: ['progress'] });
+    },
   });
 }
 
@@ -234,14 +256,55 @@ export function useUpdateLog(sessionId: number) {
   return useMutation({
     mutationFn: async (input: { id: number; weightKg: number; performedReps: number }) =>
       (await api.put<SetLogResponse>(`/api/logs/${input.id}`, input)).data,
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['sessions', sessionId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['sessions'] });
+      qc.invalidateQueries({ queryKey: ['progress'] });
+    },
+  });
+}
+
+export function useDeleteLog() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (logId: number) => {
+      await api.delete(`/api/logs/${logId}`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['sessions'] });
+      qc.invalidateQueries({ queryKey: ['progress'] });
+    },
+  });
+}
+
+export function usePlanSessions(planId: number) {
+  return useQuery({
+    queryKey: ['sessions', 'plan', planId],
+    queryFn: async () =>
+      (await api.get<SessionSummary[]>(`/api/plans/${planId}/sessions`)).data,
+  });
+}
+
+export function useDeleteSession() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (sessionId: number) => {
+      await api.delete(`/api/sessions/${sessionId}`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['sessions'] });
+      qc.invalidateQueries({ queryKey: ['progress'] });
+    },
   });
 }
 
 export function useFinishSession() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: async (sessionId: number) => {
       await api.post(`/api/sessions/${sessionId}/finish`);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['sessions'] });
     },
   });
 }

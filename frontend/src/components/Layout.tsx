@@ -38,7 +38,7 @@ export function Layout({ title, back, actions, children }: Props) {
       <header className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto flex h-14 max-w-3xl items-center gap-3 px-4">
           {back ? (
-            <Button variant="ghost" size="icon" onClick={() => navigate(back)} aria-label="Voltar">
+            <Button type="button" variant="ghost" size="icon" onClick={() => navigate(back)} aria-label="Voltar">
               <span className="text-xl">‹</span>
             </Button>
           ) : (
@@ -48,11 +48,11 @@ export function Layout({ title, back, actions, children }: Props) {
           )}
           <h1 className="flex-1 truncate text-base font-semibold">{title}</h1>
           {actions}
-          <Button variant="ghost" size="icon" onClick={toggle} aria-label="Alternar tema">
+          <Button type="button" variant="ghost" size="icon" onClick={toggle} aria-label="Alternar tema">
             {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </Button>
           {user && (
-            <Button variant="ghost" size="icon" onClick={logout} aria-label="Sair">
+            <Button type="button" variant="ghost" size="icon" onClick={logout} aria-label="Sair">
               <LogOut className="h-4 w-4" />
             </Button>
           )}

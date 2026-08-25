@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
@@ -20,6 +21,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const setAuth = useAuth((s) => s.setAuth);
   const login = useLogin();
+  const [formError, setFormError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -27,12 +29,13 @@ export function LoginPage() {
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const onSubmit = handleSubmit(async (data) => {
+    setFormError(null);
     try {
       const res = await login.mutateAsync(data);
       setAuth(res.token, res.user);
       navigate('/');
     } catch (e) {
-      alert(extractApiError(e));
+      setFormError(extractApiError(e));
     }
   });
 
@@ -63,6 +66,11 @@ export function LoginPage() {
               <p className="text-xs text-destructive">{errors.password.message}</p>
             )}
           </div>
+          {formError && (
+            <p role="alert" className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {formError}
+            </p>
+          )}
           <Button type="submit" className="w-full" size="lg" disabled={isSubmitting || login.isPending}>
             {login.isPending ? 'Entrando…' : 'Entrar'}
           </Button>

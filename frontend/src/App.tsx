@@ -2,12 +2,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { ActiveSessionPage } from './pages/ActiveSessionPage';
+import { SessionSetPage } from './pages/SessionSetPage';
 import { ExerciseFormPage } from './pages/ExerciseFormPage';
 import { LoginPage } from './pages/LoginPage';
 import { PlanDetailPage } from './pages/PlanDetailPage';
 import { PlanFormPage } from './pages/PlanFormPage';
 import { PlansListPage } from './pages/PlansListPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { SessionReviewPage } from './pages/SessionReviewPage';
 import { WorkoutFormPage } from './pages/WorkoutFormPage';
 import { useAuth } from './stores/auth';
 
@@ -72,6 +74,11 @@ export default function App() {
               element={<ExerciseFormPage />}
             />
             <Route path="/sessions/:sessionId" element={<ActiveSessionPage />} />
+            <Route
+              path="/sessions/:sessionId/exercises/:exerciseId/sets/:setIndex"
+              element={<SessionSetPage />}
+            />
+            <Route path="/sessions/:sessionId/review" element={<SessionReviewPage />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

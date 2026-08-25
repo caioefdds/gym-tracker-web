@@ -18,9 +18,16 @@ import com.caiofagundes.gymtracker.repository.PlannedSetRepository;
 import com.caiofagundes.gymtracker.repository.SetLogRepository;
 import com.caiofagundes.gymtracker.repository.WorkoutRepository;
 import com.caiofagundes.gymtracker.repository.WorkoutSessionRepository;
+import com.caiofagundes.gymtracker.repository.WorkoutPlanRepository;
 import com.caiofagundes.gymtracker.web.dto.SessionDtos;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,13 +39,21 @@ public class SessionService {
     private final ExerciseRepository exercises;
     private final PlannedSetRepository plannedSets;
     private final SetLogRepository setLogs;
+    private final WorkoutPlanRepository plans;
 
-    public SessionService(WorkoutSessionRepository sessions, WorkoutRepository workouts, ExerciseRepository exercises, PlannedSetRepository plannedSets, SetLogRepository setLogs) {
+    public SessionService(
+            WorkoutSessionRepository sessions,
+            WorkoutRepository workouts,
+            ExerciseRepository exercises,
+            PlannedSetRepository plannedSets,
+            SetLogRepository setLogs,
+            WorkoutPlanRepository plans) {
         this.sessions = sessions;
         this.workouts = workouts;
         this.exercises = exercises;
         this.plannedSets = plannedSets;
         this.setLogs = setLogs;
+        this.plans = plans;
     }
 
     @Transactional
@@ -69,6 +84,37 @@ public class SessionService {
             return new SessionDtos.SessionExerciseNode(ex.getId(), ex.getName(), ex.getOrderIndex(), setNodes);
         }).toList();
         return new SessionDtos.SessionResponse(s.getId(), s.getPlan().getId(), s.getWorkout().getId(), s.getWorkout().getName(), s.getStartedAt(), s.getFinishedAt(), nodes);
+    }
+
+    @Transactional(readOnly=true)
+    public SessionDtos.ExerciseHistoryResponse exerciseHistory(Long userId, Long sessionId, Long exerciseId) {
+        WorkoutSession session = this.sessions.findByIdAndOwner(sessionId, userId).orElseThrow(() -> new NotFoundException("Sessão não encontrada"));
+        Exercise exercise = this.exercises.findByIdAndOwner(exerciseId, userId).orElseThrow(() -> new NotFoundException("Exercício não encontrado"));
+        if (!exercise.getWorkout().getId().equals(session.getWorkout().getId())) {
+            throw new NotFoundException("Exercício não encontrado nesta sessão");
+        }
+        List<SetLog> logs = this.setLogs.findHistoryForExercise(
+                session.getWorkout().getId(),
+                exercise.getId(),
+                exercise.getName(),
+                sessionId,
+                userId);
+        LinkedHashMap<Long, List<SetLog>> bySession = new LinkedHashMap<Long, List<SetLog>>();
+        for (SetLog log : logs) {
+            bySession.computeIfAbsent(log.getSession().getId(), k -> new ArrayList<SetLog>()).add(log);
+        }
+        List<SessionDtos.HistorySession> history = bySession.entrySet().stream().limit(8L).map(entry -> {
+            List<SetLog> sessionLogs = entry.getValue();
+            WorkoutSession past = sessionLogs.get(0).getSession();
+            OffsetDateTime date = past.getFinishedAt() != null ? past.getFinishedAt() : past.getStartedAt();
+            List<SessionDtos.HistorySet> sets = sessionLogs.stream().map(l -> new SessionDtos.HistorySet(
+                    l.getPlannedSet().getOrderIndex(),
+                    l.getPlannedSet().getType(),
+                    l.getWeightKg(),
+                    l.getPerformedReps())).toList();
+            return new SessionDtos.HistorySession(past.getId(), date, sets);
+        }).toList();
+        return new SessionDtos.ExerciseHistoryResponse(exercise.getName(), history);
     }
 
     @Transactional
@@ -104,6 +150,43 @@ public class SessionService {
 
     private SessionDtos.SetLogResponse toLogResponse(SetLog log) {
         return new SessionDtos.SetLogResponse(log.getId(), log.getPlannedSet().getId(), log.getWeightKg(), log.getPerformedReps(), log.getLoggedAt());
+    }
+
+    @Transactional(readOnly=true)
+    public List<SessionDtos.SessionSummary> listByPlan(Long userId, Long planId) {
+        this.plans.findByIdAndUserId(planId, userId).orElseThrow(() -> new NotFoundException("Ficha não encontrada"));
+        return this.sessions.summarizeByPlan(planId, userId).stream().map(row -> new SessionDtos.SessionSummary(
+                ((Number) row[0]).longValue(),
+                ((Number) row[1]).longValue(),
+                (String) row[2],
+                toOffset(row[3]),
+                toOffset(row[4]),
+                ((Number) row[5]).longValue())).toList();
+    }
+
+    @Transactional
+    public void deleteSession(Long userId, Long sessionId) {
+        WorkoutSession s = this.sessions.findByIdAndOwner(sessionId, userId).orElseThrow(() -> new NotFoundException("Sessão não encontrada"));
+        this.sessions.delete(s);
+    }
+
+    private static OffsetDateTime toOffset(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof OffsetDateTime odt) {
+            return odt;
+        }
+        if (value instanceof Timestamp ts) {
+            return ts.toInstant().atOffset(ZoneOffset.UTC);
+        }
+        if (value instanceof Instant instant) {
+            return instant.atOffset(ZoneOffset.UTC);
+        }
+        if (value instanceof LocalDateTime ldt) {
+            return ldt.atOffset(ZoneOffset.UTC);
+        }
+        throw new IllegalStateException("Tipo de data inesperado: " + value.getClass().getName());
     }
 }
 

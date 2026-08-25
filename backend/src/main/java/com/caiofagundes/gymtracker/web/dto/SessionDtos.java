@@ -43,5 +43,23 @@ public class SessionDtos {
 
     public record SessionExerciseNode(Long exerciseId, String exerciseName, int orderIndex, List<SessionPlannedSet> sets) {
     }
+
+    public record ExerciseHistoryResponse(String exerciseName, List<HistorySession> sessions) {
+    }
+
+    public record HistorySession(Long sessionId, OffsetDateTime date, List<HistorySet> sets) {
+    }
+
+    public record HistorySet(int orderIndex, SetType type, double weightKg, int performedReps) {
+    }
+
+    public record SessionSummary(
+            Long sessionId,
+            Long workoutId,
+            String workoutName,
+            OffsetDateTime startedAt,
+            OffsetDateTime finishedAt,
+            long loggedSets) {
+    }
 }
 

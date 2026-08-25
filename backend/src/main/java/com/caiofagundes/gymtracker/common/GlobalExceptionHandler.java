@@ -59,6 +59,11 @@ public class GlobalExceptionHandler {
         return this.error(HttpStatus.BAD_REQUEST, ex.getMessage(), null);
     }
 
+    @ExceptionHandler(value={Exception.class})
+    public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex) {
+        return this.error(HttpStatus.INTERNAL_SERVER_ERROR, "Não foi possível concluir a operação", null);
+    }
+
     private ResponseEntity<ErrorResponse> error(HttpStatus status, String message, Map<String, String> fields) {
         return ResponseEntity.status(status).body(new ErrorResponse(status.value(), message, OffsetDateTime.now(), fields));
     }

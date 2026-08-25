@@ -84,7 +84,7 @@ export function WorkoutFormPage() {
       back={`/plans/${planIdNum}`}
       actions={
         isEditing ? (
-          <Button variant="ghost" size="icon" onClick={onDelete} aria-label="Excluir">
+          <Button type="button" variant="ghost" size="icon" onClick={onDelete} aria-label="Excluir">
             <Trash2 className="h-4 w-4" />
           </Button>
         ) : null

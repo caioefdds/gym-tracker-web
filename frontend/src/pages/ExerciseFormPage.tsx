@@ -89,6 +89,10 @@ export function ExerciseFormPage() {
       } else {
         const created = await create.mutateAsync({ name: data.name });
         setResolvedId(created.id);
+        navigate(
+          `/plans/${planIdNum}/workouts/${workoutIdNum}/exercises/${created.id}`,
+          { replace: true },
+        );
       }
     } catch (e) {
       alert(extractApiError(e));
@@ -112,7 +116,7 @@ export function ExerciseFormPage() {
       back={`/plans/${planIdNum}`}
       actions={
         resolvedId ? (
-          <Button variant="ghost" size="icon" onClick={onDelete} aria-label="Excluir">
+          <Button type="button" variant="ghost" size="icon" onClick={onDelete} aria-label="Excluir">
             <Trash2 className="h-4 w-4" />
           </Button>
         ) : null
@@ -129,13 +133,25 @@ export function ExerciseFormPage() {
           />
           {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
         </div>
-        <Button
-          type="submit"
-          size="md"
-          disabled={isSubmitting || create.isPending || update.isPending}
-        >
-          Salvar nome
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            type="submit"
+            size="md"
+            disabled={isSubmitting || create.isPending || update.isPending}
+          >
+            {create.isPending || update.isPending ? 'Salvando…' : 'Salvar nome'}
+          </Button>
+          {resolvedId && (
+            <Button
+              type="button"
+              variant="outline"
+              size="md"
+              onClick={() => navigate(`/plans/${planIdNum}`)}
+            >
+              Concluir
+            </Button>
+          )}
+        </div>
       </form>
 
       {resolvedId && (
@@ -186,7 +202,7 @@ function PlannedSetsEditor({
       ))}
       <div className="flex flex-wrap gap-2 pt-2">
         {(['WARMUP', 'WORKING', 'STRENGTH'] as SetType[]).map((t) => (
-          <Button key={t} variant="outline" size="sm" onClick={() => onAdd(t)}>
+          <Button key={t} type="button" variant="outline" size="sm" onClick={() => onAdd(t)}>
             <Plus className="h-3.5 w-3.5" />
             {setTypeShortLabel[t]}
           </Button>
@@ -275,6 +291,7 @@ function PlannedSetTile({
         aria-label="Repetições máximas"
       />
       <Button
+        type="button"
         variant="ghost"
         size="icon"
         onClick={() => remove.mutate(row.id)}

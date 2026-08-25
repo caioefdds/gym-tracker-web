@@ -22,6 +22,7 @@ import com.caiofagundes.gymtracker.service.SessionService;
 import com.caiofagundes.gymtracker.web.dto.SessionDtos;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,6 +55,12 @@ public class SessionController {
         return this.service.getSession(CurrentUser.requireUserId(), id);
     }
 
+    @GetMapping(value={"/sessions/{id}/exercises/{exerciseId}/history"})
+    public SessionDtos.ExerciseHistoryResponse exerciseHistory(
+            @PathVariable Long id, @PathVariable Long exerciseId) {
+        return this.service.exerciseHistory(CurrentUser.requireUserId(), id, exerciseId);
+    }
+
     @PostMapping(value={"/sessions/{id}/logs"})
     @ResponseStatus(value=HttpStatus.CREATED)
     public SessionDtos.SetLogResponse logSet(@PathVariable Long id, @Valid @RequestBody SessionDtos.SetLogRequest req) {
@@ -75,6 +82,17 @@ public class SessionController {
     @ResponseStatus(value=HttpStatus.NO_CONTENT)
     public void finish(@PathVariable Long id) {
         this.service.finish(CurrentUser.requireUserId(), id);
+    }
+
+    @GetMapping(value={"/plans/{planId}/sessions"})
+    public List<SessionDtos.SessionSummary> listByPlan(@PathVariable Long planId) {
+        return this.service.listByPlan(CurrentUser.requireUserId(), planId);
+    }
+
+    @DeleteMapping(value={"/sessions/{id}"})
+    @ResponseStatus(value=HttpStatus.NO_CONTENT)
+    public void deleteSession(@PathVariable Long id) {
+        this.service.deleteSession(CurrentUser.requireUserId(), id);
     }
 }
 

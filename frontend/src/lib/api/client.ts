@@ -18,17 +18,25 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (error: AxiosError<ApiError>) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !isAuthCredentialRequest(error)) {
       useAuth.getState().logout();
     }
     return Promise.reject(error);
   },
 );
 
+function isAuthCredentialRequest(error: AxiosError): boolean {
+  const url = error.config?.url ?? '';
+  return /\/api\/auth\/(login|register)(?:\?|$)/.test(url);
+}
+
 export function extractApiError(err: unknown): string {
   if (axios.isAxiosError(err)) {
-    const data = err.response?.data as ApiError | undefined;
-    return data?.message ?? err.message;
+    const data = err.response?.data as (ApiError & { detail?: string; title?: string }) | undefined;
+    const fromBody = data?.message ?? data?.detail ?? data?.title;
+    if (fromBody && fromBody !== 'Unauthorized') return fromBody;
+    if (err.response?.status === 401) return 'E-mail ou senha incorretos';
+    return err.message;
   }
   return 'Erro inesperado';
 }
